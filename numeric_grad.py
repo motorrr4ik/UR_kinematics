@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import fmin, fmin_cg, fmin_bfgs, fmin_tnc, golden, fsolve, minimize
 from forward_inverse_kinematics import inverse_kinematics, jacobian_solution, coop_jacobian, transformation_matrix, forward_kinematics_solution, Rx, Ry, Rz, manipulability_metrics
 
 config_matrix = np.array([[0, np.pi/2.0, 0.1625],
@@ -9,11 +11,12 @@ config_matrix = np.array([[0, np.pi/2.0, 0.1625],
                           [0, 0, 0.0996]])
 
 P_r = np.array([0, 0, 0.05])
-P_ak = np.array([0.23, 0.33, 0.43])
+# P_ak = np.array([0.23, 0.33, 0.43])
+P_ak = np.array([0.1, 0.1, 0.1])
 P_akp = np.array([0.5, 0.55, 0.75])
 R_orientation = Rz(np.pi/2)
 h = 0.5
-k = 0.3
+k = 3
 #################################################
 A = np.array(np.zeros((6,6)))
 A[:3, :3] = 0.5*np.eye(3)
@@ -37,8 +40,8 @@ def get_T(R, P):
 def get_metrics(T1, T2):
     IK1 = inverse_kinematics(config_matrix, T1)
     IK2 = inverse_kinematics(config_matrix, T2)
-    q1 = IK1[:, 1].flatten()
-    q2 = IK2[:, 1].flatten()
+    q1 = IK1[:, 4].flatten()
+    q2 = IK2[:, 4].flatten()
     J1 = jacobian_solution(config_matrix, 6, q1)
     J2 = jacobian_solution(config_matrix, 6, q2)
     J_coop = coop_jacobian(J1,J2)
@@ -50,35 +53,45 @@ def from_Pa_to_mu(P_a):
     T1 = get_T(R_orientation, P12[:3])
     T2 = get_T(R_orientation, P12[3:])
     w = get_metrics(T1, T2)
-    return w
+    return -1*w
 
-for i in range(0,100):
+w_max = fmin(from_Pa_to_mu, P_ak)
+print(w_max)
 
-    Px = np.array([P_ak[0], P_akp[1], P_akp[2]])
-    Py = np.array([P_akp[0], P_ak[1], P_akp[2]])
-    Pz = np.array([P_akp[0], P_akp[1], P_ak[2]])
-    # print(Px, Py, Pz)
-    wx = from_Pa_to_mu(Px)
-    wy = from_Pa_to_mu(Py)
-    wz = from_Pa_to_mu(Pz)
-    w_p = from_Pa_to_mu(P_akp)
-    # print(wx, wy, wz)
+# for i in range(0,100):
 
-    P_aknx = P_ak[0] + k*(wx-w_p)/h
-    P_akny = P_ak[1] + k*(wy-w_p)/h
-    P_aknz = P_ak[2] + k*(wz-w_p)/h
+#     Px = np.array([P_ak[0], P_akp[1], P_akp[2]])
+#     Py = np.array([P_akp[0], P_ak[1], P_akp[2]])
+#     Pz = np.array([P_akp[0], P_akp[1], P_ak[2]])
+#     # print(Px, Py, Pz)
+#     # Px = np.array([P_ak[0]+h, P_akp[1], P_akp[2]])
+#     # Py = np.array([P_akp[0], P_ak[1]+h, P_akp[2]])
+#     # Pz = np.array([P_akp[0], P_akp[1], P_ak[2]+h])
+#     wx = from_Pa_to_mu(Px)
+#     wy = from_Pa_to_mu(Py)
+#     wz = from_Pa_to_mu(Pz)
+#     w_p = from_Pa_to_mu(P_akp)
+#     # print(wx, wy, wz)
+#     # print(k*(wx-w_p)/h, k*(wy-w_p)/h, k*(wz-w_p)/h)
 
-    # P_aknx = (P_ak[0]+(i/1000)) - k*(w-w_p)/h
-    # P_akny = (P_ak[1]+(i/1000)) - k*(w-w_p)/h
-    # P_aknz = (P_ak[2]+(i/1000)) - k*(w-w_p)/h
-    P_akn = np.array([P_aknx, P_akny, P_aknz])
-    # P_akn = P_aknx + P_akny + P_aknz
+#     # P_aknx = P_ak[0] + k*(wx-w_p)/h
+#     # P_akny = P_ak[1] + k*(wy-w_p)/h
+#     # P_aknz = P_ak[2] + k*(wz-w_p)/h
 
-    print(P_akn)
-    P_akp  = P_ak
-    P_ak = P_akn
+#     P_aknx = P_ak[0] + wx/(k*(wx-w_p)/h)
+#     P_akny = P_ak[1] + wy/(k*(wy-w_p)/h)
+#     P_aknz = P_ak[2] + wz/(k*(wz-w_p)/h)
 
-print(P_ak)
+#     # P_aknx = (P_ak[0]+(i/1000)) - k*(w-w_p)/h
+#     # P_akny = (P_ak[1]+(i/1000)) - k*(w-w_p)/h
+#     # P_aknz = (P_ak[2]+(i/1000)) - k*(w-w_p)/h
+#     P_akn = np.array([P_aknx, P_akny, P_aknz])
+#     # P_akn = P_aknx + P_akny + P_aknz
+#     print(P_akn)
+#     P_akp  = P_ak
+#     P_ak = P_akn
+
+# print(P_ak)
 
 
 
