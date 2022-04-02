@@ -9,7 +9,7 @@ config_matrix = np.array([[0, np.pi/2.0, 0.1625],
                           [0, 0, 0.0996]])
 
 P_r = np.array([0, 0, 0.05])
-P_ak = np.array([0.85, 0.63, 0.23])
+P_ak = np.array([0.23, 0.33, 0.43])
 P_akp = np.array([0.5, 0.55, 0.75])
 R_orientation = Rz(np.pi/2)
 h = 0.5
@@ -52,7 +52,7 @@ def from_Pa_to_mu(P_a):
     w = get_metrics(T1, T2)
     return w
 
-for i in range(1,11):
+for i in range(0,100):
 
     Px = np.array([P_ak[0], P_akp[1], P_akp[2]])
     Py = np.array([P_akp[0], P_ak[1], P_akp[2]])
@@ -62,7 +62,7 @@ for i in range(1,11):
     wy = from_Pa_to_mu(Py)
     wz = from_Pa_to_mu(Pz)
     w_p = from_Pa_to_mu(P_akp)
-    print(wx, wy, wz)
+    # print(wx, wy, wz)
 
     P_aknx = P_ak[0] + k*(wx-w_p)/h
     P_akny = P_ak[1] + k*(wy-w_p)/h
