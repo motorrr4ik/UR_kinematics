@@ -58,10 +58,18 @@ def from_Pa_to_mu(P_a, P_ap):
     w_p = get_metrics(T1_p, T2_p)
     return w, w_p
 
-w, w_p = from_Pa_to_mu(P_ak, P_akp)
+for i in range(1,11):
+    w, w_p = from_Pa_to_mu(P_ak, P_akp)
+    P_aknx = (P_ak[0]+(i/10)) - k*(w-w_p)/h
+    P_akny = (P_ak[1]+(i/10)) - k*(w-w_p)/h
+    P_aknz = (P_ak[2]+(i/10)) - k*(w-w_p)/h
+    # print(P_aknx)
+    # break
+    P_akn = np.array([P_aknx,P_aknx,P_aknx])
+    P_ap  = P_ak
+    P_ak = P_akn
 
-P_akn = P_ak - k*(w-w_p)/h
-print(P_akn)
+# print(P_akn)
 
 
 
