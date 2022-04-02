@@ -45,17 +45,20 @@ def get_metrics(T1, T2):
     w = manipulability_metrics(J_coop)
     return w
 
-P12 = get_P_vecs(P_ak, P_r)
-P12_p = get_P_vecs(P_akp, P_r)
+def from_Pa_to_mu(P_a, P_ap):
+    P12 = get_P_vecs(P_a, P_r)
+    P12_p = get_P_vecs(P_ap, P_r)
 
-T1 = get_T(R_orientation, P12[:3])
-T1_p = get_T(R_orientation, P12_p[:3])
-T2 = get_T(R_orientation, P12[3:])
-T2_p = get_T(R_orientation, P12_p[3:])
+    T1 = get_T(R_orientation, P12[:3])
+    T1_p = get_T(R_orientation, P12_p[:3])
+    T2 = get_T(R_orientation, P12[3:])
+    T2_p = get_T(R_orientation, P12_p[3:])
 
-w = get_metrics(T1, T2)
-w_p = get_metrics(T1_p, T2_p)
+    w = get_metrics(T1, T2)
+    w_p = get_metrics(T1_p, T2_p)
+    return w, w_p
 
+w, w_p = from_Pa_to_mu(P_ak, P_akp)
 
 P_akn = P_ak - k*(w-w_p)/h
 print(P_akn)
