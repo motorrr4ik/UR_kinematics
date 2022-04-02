@@ -13,6 +13,7 @@ P_ak = np.array([0.85, 0.63, 0.23])
 P_akp = np.array([0.5, 0.55, 0.75])
 R_orientation = Rz(np.pi/2)
 h = 0.5
+k = 0.3
 #################################################
 A = np.array(np.zeros((6,6)))
 A[:3, :3] = 0.5*np.eye(3)
@@ -22,7 +23,7 @@ A[3:, 3:] = -1*np.eye(3)
 #################################################
 def get_P_vecs(P_a, P_r):
     A_inv = np.linalg.inv(A)
-    P_vecs = np.array([P_a, P_r])
+    P_vecs = np.array([P_a, P_r]).flatten()
     P12 = A_inv.dot(P_vecs)
     return P12
 ##################################################
@@ -44,7 +45,20 @@ def get_metrics(T1, T2):
     w = manipulability_metrics(J_coop)
     return w
 
+P12 = get_P_vecs(P_ak, P_r)
+P12_p = get_P_vecs(P_akp, P_r)
 
+T1 = get_T(R_orientation, P12[:3])
+T1_p = get_T(R_orientation, P12_p[:3])
+T2 = get_T(R_orientation, P12[3:])
+T2_p = get_T(R_orientation, P12_p[3:])
+
+w = get_metrics(T1, T2)
+w_p = get_metrics(T1_p, T2_p)
+
+
+P_akn = P_ak - k*(w-w_p)/h
+print(P_akn)
 
 
 
