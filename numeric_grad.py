@@ -44,7 +44,7 @@ def get_metrics(T1, T2):
     J_coop = coop_jacobian(J1,J2)
     w = manipulability_metrics(J_coop)
     return w
-
+##################################################
 def from_Pa_to_mu(P_a):
     P12 = get_P_vecs(P_a, P_r)
     T1 = get_T(R_orientation, P12[:3])
@@ -53,18 +53,33 @@ def from_Pa_to_mu(P_a):
     return w
 
 for i in range(1,11):
-    w = from_Pa_to_mu(P_ak)
+
+    Px = np.array([P_ak[0]+(i/10), P_akp[1], P_akp[2]])
+    Py = np.array([P_akp[0], P_ak[1]+(i/10), P_akp[2]])
+    Pz = np.array([P_akp[0], P_akp[1], P_ak[2]+(i/10)])
+    # print(Px, Py, Pz)
+
+    wx = from_Pa_to_mu(Px)
+    wy = from_Pa_to_mu(Py)
+    wz = from_Pa_to_mu(Pz)
     w_p = from_Pa_to_mu(P_akp)
-    P_aknx = (P_ak[0]+(i/10)) - k*(w-w_p)/h
-    P_akny = (P_ak[1]+(i/10)) - k*(w-w_p)/h
-    P_aknz = (P_ak[2]+(i/10)) - k*(w-w_p)/h
-    # print(P_aknx)
-    # break
-    P_akn = np.array([P_aknx,P_aknx,P_aknx])
-    P_ap  = P_ak
+    print(wx, wy, wz)
+
+    P_aknx = P_ak - k*(wx-w_p)/h
+    P_akny = P_ak - k*(wy-w_p)/h
+    P_aknz = P_ak - k*(wz-w_p)/h
+
+    # P_aknx = (P_ak[0]+(i/1000)) - k*(w-w_p)/h
+    # P_akny = (P_ak[1]+(i/1000)) - k*(w-w_p)/h
+    # P_aknz = (P_ak[2]+(i/1000)) - k*(w-w_p)/h
+    # P_akn = np.array([P_aknx,P_akny,P_aknz])
+
+    P_akn = P_aknx + P_akny + P_aknz
+    print(P_akn)
+    P_akp  = P_ak
     P_ak = P_akn
 
-# print(P_akn)
+print(P_ak)
 
 
 
