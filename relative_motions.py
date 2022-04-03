@@ -14,7 +14,7 @@ config_matrix = np.array([[0, pi/2.0, 0.1625],
                         [0, 0, 0.0996]])
 
 # P0 = np.array([[0],[0],[0.5]])
-Z = 0.5
+Z = 0.262
 x = np.arange(-1, 1.05, 0.05)
 y = np.arange(-1, 1.05, 0.05)
 
@@ -68,8 +68,8 @@ def calc_T_mat(R, p):
 
 R1 = calc_rot(R_between, R0, R_r)
 R2 = R0
-print(R1)
-print(R2)
+# print(R1)
+# print(R2)
 
 
 
@@ -97,14 +97,15 @@ for i in range(len(x)):
         # print("theta 1: ", theta1[:,:1])
         # print("theta 2: ", theta2[:,:2])
         
-        J1 = jacobian_solution(config_matrix, 6, theta1[:,2].flatten())
-        J2 = jacobian_solution(config_matrix, 6, theta2[:,2].flatten())
+        J1 = jacobian_solution(config_matrix, 6, theta1[:, 0].flatten())
+        J2 = jacobian_solution(config_matrix, 6, theta2[:, 0].flatten())
         Jc = coop_jacobian(J1, J2)
 
-        print(J1)
+        # print(J1)
         # print(J2)
 
-        w[j,i] = manipulability_metrics(Jc[6:, :])
+        w[i,j] = manipulability_metrics(Jc[6:, :])
+        
         # w[j,i] = manipulability_metrics(J1)
     
         # w2 = np.append(w2, manipulability_metrics(J2))
@@ -119,7 +120,7 @@ ax.set_xticks(np.arange(len(x)))
 ax.set_yticks(np.arange(len(y)))
 ax.set_xticklabels(np.round(x,2))
 ax.set_yticklabels(np.round(y,2))
-plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+plt.setp(ax.get_xticklabels(), rotation=90, ha="right",
          rotation_mode="anchor")
 
 # for i in range(w.shape[0]):
@@ -132,7 +133,6 @@ ax.set_title("Heatmap")
 # cax = divider.append_axes("right", "3%", pad="1%")
 ax.figure.colorbar(im, ax=ax)
 figure.tight_layout()
-print(np.sort(w))
 plt.show()
     
 

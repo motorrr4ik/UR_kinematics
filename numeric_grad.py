@@ -1,3 +1,4 @@
+from urllib.robotparser import RobotFileParser
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import fmin, fmin_cg, fmin_bfgs, fmin_tnc, golden, fsolve, minimize
@@ -14,9 +15,9 @@ P_r = np.array([0, 0, 0.05])
 # P_ak = np.array([0.23, 0.33, 0.43])
 P_ak = np.array([0.1, 0.1, 0.1])
 P_akp = np.array([0.5, 0.55, 0.75])
-R_orientation = Rz(np.pi/2)
+
 h = 0.5
-k = 3
+k = 1
 #################################################
 A = np.array(np.zeros((6,6)))
 A[:3, :3] = 0.5*np.eye(3)
@@ -33,30 +34,50 @@ def get_P_vecs(P_a, P_r):
 def get_T(R, P):
     T = np.array(np.zeros((4,4)))
     T[:3, :3] = R
-    T[:3, 3] = P[:3]
+    T[:3, 3] = P
     T[3,3] = 1
     return T
+##################################################
+def get_R(R_12, R2, R_r):
+    # R1 = np.linalg.inv(R_r).dot(R2).dot(R_12)
+    R1 = (R_r.T).dot(R2).dot(R_12)
+    # R1 = R_r.dot(np.linalg.inv(R2)).dot(np.linalg.inv(R_12))
+    # print(R)
+    return R1
 ##################################################
 def get_metrics(T1, T2):
     IK1 = inverse_kinematics(config_matrix, T1)
     IK2 = inverse_kinematics(config_matrix, T2)
-    q1 = IK1[:, 4].flatten()
-    q2 = IK2[:, 4].flatten()
+    q1 = IK1[:, 0].flatten()
+    q2 = IK2[:, 0].flatten()
     J1 = jacobian_solution(config_matrix, 6, q1)
     J2 = jacobian_solution(config_matrix, 6, q2)
     J_coop = coop_jacobian(J1,J2)
     w = manipulability_metrics(J_coop)
     return w
 ##################################################
-def from_Pa_to_mu(P_a):
+def from_Pa_to_mu(P_a, R1, R2):
     P12 = get_P_vecs(P_a, P_r)
-    T1 = get_T(R_orientation, P12[:3])
-    T2 = get_T(R_orientation, P12[3:])
+    T1 = get_T(np.transpose(R1), P12[:3])
+    T2 = get_T(R2, P12[3:])
     w = get_metrics(T1, T2)
-    return -1*w
+    return w
 
-w_max = fmin(from_Pa_to_mu, P_ak)
-print(w_max)
+R0 = Rx(np.pi/2)
+R_r = Rx(np.pi)
+R_between = np.eye(3)
+R2 = R0
+R1 = get_R(R_between, R2, R_r)
+
+test = np.array([0.1, -0.75, 0.5])
+test2 = np.array([-0.75, 0.1, 0.5])
+w = from_Pa_to_mu(test, R1, R2)
+w2 = from_Pa_to_mu(test2, R1, R2)
+print(w)
+print(w2)
+
+# w_max = fmin(from_Pa_to_mu, P_ak, args=(R1, R2))
+# print(w_max)
 
 # for i in range(0,100):
 
