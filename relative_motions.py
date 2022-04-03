@@ -1,16 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from math import pi, cos, sin, sqrt
 from forward_inverse_kinematics import forward_kinematics_solution
 from forward_inverse_kinematics import inverse_kinematics
 from forward_inverse_kinematics import jacobian_solution, manipulability_metrics, coop_jacobian
 from forward_inverse_kinematics import Rx, Ry, Rz
 
-config_matrix = np.array([[0, pi/2.0, 0.1625],
+config_matrix = np.array([[0, np.pi/2.0, 0.1625],
                         [-0.425, 0, 0],
                         [-0.3922, 0, 0],
-                        [0, pi/2.0, 0.1333],
-                        [0, -pi/2.0, 0.0997],
+                        [0, np.pi/2.0, 0.1333],
+                        [0, -np.pi/2.0, 0.0997],
                         [0, 0, 0.0996]])
 
 # P0 = np.array([[0],[0],[0.5]])
@@ -28,8 +27,8 @@ P_r = np.array([0, 0, 0.05])
 w = np.array(np.zeros((len(x),len(y))))
 # w2 = np.array(np.zeros((1,6)))
 
-R0 = Rx(pi/2)
-R_r = Rx(pi)
+R0 = Rx(np.pi/2)
+R_r = Rx(np.pi)
 R_between = np.eye(3)
 # print(R0)
 # print()
